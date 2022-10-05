@@ -1,47 +1,104 @@
-- run the mongoshell: `mongo + enter`
+
+## 20. Introduction to MongoDB
+
+- What is MongoDB?
+
+  - Document Oriented Database system
+  - NoSQL
+  - Some important terms: Database, Table/Collection, Document/Row, Field/Column
+
+  ```js
+    // document example
+      {
+        id : '1',
+        name: 'anisul',
+        languages: ['bangla', 'english']
+
+      }
+  ```
+
+## 21. Environment setup
+
+- Download & install MongoDB
+- MongoDB Compass
+- Check installation
+
+  ```js
+  mongod --version (mongodb server version)
+  mongo --version (mongodb shell version)
+  ```
+
+## 22. Basic command
+
 - database
-  - show all the databases: `show dbs`
-  - create and switch to database: `use databaseName`
-  - check which database you are in: `db + Enter`
-  - delete database: `db.dropDatabase()`
-- collection / table
-  - create collection: `db.createCollection(name, options)`
+
+  - show databases: `show dbs`
+  - create / switch to a Database: `use databaseName` example: `use productsDB`
+  - check the Database you are in : `db + enter`
+  - drop database : `db.dropDatabase()`
+
+- collections
   - show collections: `show collections`
-  - To create a collection (table) and add document (row) we can use insert or save method:
-    `db.collectionName.insert([{document1},{document2}])`
-    `db.collectionName.insertOne({document1})`
-    `db.collectionName.insertMany([{document1},{document2}])`
-  - drop a collection: db.collectionName.drop()
+  - create collection : `db.createCollection(name, option)`
+    example `db.createCollection("products")`
+  - drop collection : `db.collectionName.drop()`
 
-<br>
+## 23. CRUD - Create Document
 
-- CRUD = Create, Read, Update, Delete
-
+- database is collection of Documents
+- insert documents command
+  - `db.collectionName.instertOne({})`
+  - `db.collectionName.instertMany([{},{}])`
+  - `db.collectionName.instert([{},{}])`
 - Create data- inserting data to user collection example
 
   ```js
     {
-      name : "anisul islam",
-      age : 31,
-      languages: ["bangla", "english"]
+      title: "Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops",
+      price: 109.95,
      }
 
   // insertOne()
-   db.users.insertOne({name : "anisul islam",age : 31,languages: ["bangla", "english"]})
+   db.products.insertOne({
+      title: "Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops",
+      price: 109.95,
+     })
 
   // insertMany()
-   db.users.insertMany([{name : "rima islam",age : 31,languages: ["urdu", "bangla"]}, {name : "rabeya begum",age : 31,languages: ["hindi", "bangla"]}])
+   db.products.insertMany([
+    {
+      title: "Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops",
+      price: 109.95,
+     },
+     {
+      title: "Mens Casual Premium Slim Fit T-Shirts ",
+      price: 22.3,
+     },
+     {
+      title: "Mens Cotton Jacket",
+      price: 55.99,
+     }
+     ])
 
   ```
+
+## 24. CRUD - Read Document
 
 - Read / Find data
 
   - read data syntax: `db.collectionName.find()`
   - read data in an easy way syntax: `db.collectionName.find().pretty()`
   - read a specific data syntax: `db.collectionName.find({field: fieldValue})`
-    - example: `db.users.find({name: "anisul islam"})`
+    - example1: `db.products.find(ObjectId("633d183e09743587af26fb07"))`
+    - example2: `db.users.find({name: "anisul islam"})`
   - limit data syntax: `db.collectionName.find({field: fieldValue}).limit(NumberOfRows)`
     - example: `db.users.find({age: 31}).limit(2)`
+  - sorting: 1 for ascending, -1 for descending
+    - example: `db.products.find().sort({price: -1})`
+  - [less than and greater than](https://www.statology.org/mongodb-greater-than-less-than/#:~:text=You%20can%20use%20the%20following,%24gt%3A%20Greater%20than)
+    - example : `db.myCollection.find({field1: {$gt:25}})`
+
+## 25. CRUD - Update Document
 
 - Update Data
 
@@ -49,7 +106,9 @@
   - update data syntax: `db.collectionName.updateOne(selection_item, update_data)`
   - update data syntax: `db.collectionName.updateMany(selection_item, update_data)`
   - find one and update data syntax: `db.collectionName.findOneAndUpdate(selection_item, update_data)`
-  - example: `db.users.update({name:"anisul islam"},{$set:{age:32}})`
+  - example: `db.products.update({id:"1"},{$set:{price:32}})`
+
+## 26. CRUD - Delete Document
 
 - Delete data
 
@@ -58,13 +117,3 @@
   - delete data syntax: `db.collectionName.deleteOne()
   - delete many data syntax: `db.collectionName.deleteMany({selected_item})
   - delete many data syntax: `db.collectionName.deleteMany({})
-
-- learn how to use mongodb compass: try CRUD operation there
-
-- how to use mongodb in VSCode
-
-  - use mongoose
-  - connect mongodb with the help of mongoose
-
-- sorting: -1 is used for descending, 1 is for ascending
-  - syntax: `db.collecttionName.find().sort({fieldName:-1/1})`
