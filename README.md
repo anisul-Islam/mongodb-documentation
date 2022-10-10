@@ -463,3 +463,13 @@ email: {
     },
   },
 ```
+
+## 19. pagination
+
+```js
+const { page = 1, limit = 10 } = req.query;
+const products = await Product.find()
+  .limit(limit)
+  .skip((page - 1) * limit);
+console.log(products);
+```
