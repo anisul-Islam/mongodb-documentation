@@ -66,6 +66,9 @@
 ## 4. CRUD - Create Document
 
 - database is collection of Documents
+- Field name regulations collected from MongoDB official website:
+  - The field name \_id is reserved
+  - Field names cannot contain the null character.
 - insert documents command
   - `db.collectionName.instertOne({})`
   - `db.collectionName.instertMany([{},{}])`
@@ -142,7 +145,9 @@
   - delete many data syntax: `db.collectionName.deleteMany({selected_item})
   - delete many data syntax: `db.collectionName.deleteMany({})
 
-## 8. Node.js and mongodb connection
+## 8. CRUD Operations in MongoDB Compass
+
+## 9. Node.js and mongodb connection
 
 - 2 ways to connect -> with mongoose package, with mongodb package
 - method 1: with mongodb package
@@ -172,7 +177,7 @@ app.listen(port, async () => {
 });
 ```
 
-## 9. Mongoose schema & model
+## 10. Mongoose schema & model
 
 - define structure of document with validation
 - we can define default values of a field
@@ -201,7 +206,7 @@ const productSchema = new mongoose.Schema({
 const Product = mongoose.model("Products", productSchema);
 ```
 
-## 10. Create document from node.js
+## 11. Create document from node.js
 
 ```js
 const addProduct = async () => {
@@ -222,7 +227,7 @@ const addProduct = async () => {
 addProduct();
 ```
 
-## 11. Read document from Database in node.js & comparsion query operators
+## 12. Read document from Database in node.js & comparsion query operators
 
 - comparsion query operators: https://www.mongodb.com/docs/manual/reference/operator/query-comparison/
   - $eq, $ne, $gt, $lt, $gte, $lte, $in, $nin
@@ -265,7 +270,7 @@ const getProducts = async (req, res) => {
 getProducts();
 ```
 
-## 12. Query Operators: Logical operators
+## 13. Query Operators: Logical operators
 
 - $and, $or, $not, $nor
 
@@ -288,7 +293,7 @@ const products = await Product.find({
 const products = await Product.find({ price: { $not: { $lt: 900 } } });
 ```
 
-## 13. counting and sorting
+## 14. counting and sorting
 
 - countDocuments() / count()
 
@@ -308,7 +313,7 @@ const products = await Product.find()
 console.log(products);
 ```
 
-## 14. update data
+## 15. update data
 
 - update data syntax: `db.collectionName.updateOne(selection_item, update_data)`
 - update data syntax: `db.collectionName.findByIdAndUpdate(selection_item, update_data, {new: true})`
@@ -335,7 +340,7 @@ const products = await Product.findByIdAndUpdate(
 console.log(products);
 ```
 
-## 15. delete data
+## 16. delete data
 
 - example: `db.users.deleteOne({name:"anisul islam"})`
 
@@ -348,7 +353,7 @@ const products = await Product.findByIdAndDelete({ _id });
 console.log(products);
 ```
 
-## 16. mongoose validations
+## 17. mongoose validations
 
 - [official documentation](https://mongoosejs.com/docs/validation.html)
 - A common gotcha for beginners is that the unique option for schemas is not a validator.
@@ -392,7 +397,7 @@ Object syntax: enum: { values: ['Coffee', 'Tea'], message: '{VALUE} is not suppo
 */
 ```
 
-## 17. Custom validations
+## 18. Custom validations
 
 - for fulfilling own requirements based on certain situation we need to create custom validations.
 - read about email vliadation
@@ -446,7 +451,7 @@ phone: {
   }
 ```
 
-## 18. npm validator
+## 19. npm validator
 
 - `npm i validator`
 
@@ -464,7 +469,7 @@ email: {
   },
 ```
 
-## 19. pagination
+## 20. pagination
 
 ```js
 const { page = 1, limit = 10 } = req.query;
