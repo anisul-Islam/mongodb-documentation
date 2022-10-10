@@ -222,7 +222,10 @@ const addProduct = async () => {
 addProduct();
 ```
 
-## 11. Read document from Database in node.js
+## 11. Read document from Database in node.js & comparsion query operators
+
+- comparsion query operators: https://www.mongodb.com/docs/manual/reference/operator/query-comparison/
+  - $eq, $ne, $gt, $lt, $gte, $lte, $in, $nin
 
 ```js
 const getProducts = async (req, res) => {
@@ -231,7 +234,14 @@ const getProducts = async (req, res) => {
     const products = await Product.find().limit(1);
     const products = await Product.find({ id: req.params.id });
     const products = await Product.find({ isAvailable: true });
+    const products = await Product.find({ price: { $eq: 1200 } });
+    const products = await Product.find({ price: { $in: [1200, 1300] } });
+    const products = await Product.find({ price: { $nin: [1200, 1300] } });
+    const products = await Product.find({ price: { $ne: 1200 } });
     const products = await Product.find({ price: { $gt: 1200 } });
+    const products = await Product.find({ price: { $lt: 1200 } });
+    const products = await Product.find({ price: { $gte: 1200 } });
+    const products = await Product.find({ price: { $lte: 1200 } });
     const products = await Product.find({ price: 1200 });
 
     const products = await Product.find({ price: { $gt: 1200 } }).select({
@@ -253,4 +263,203 @@ const getProducts = async (req, res) => {
   }
 };
 getProducts();
+```
+
+## 12. Query Operators: Logical operators
+
+- $and, $or, $not, $nor
+
+```js
+// {$and : [{},{}]}
+const products = await Product.find({
+  $and: [{ price: { $lt: 1400 } }, { rating: { $gt: 4 } }],
+});
+
+const products = await Product.find({
+  $or: [{ price: { $lt: 1400 } }, { rating: { $gt: 4 } }],
+});
+
+// returns all that fail both clauses
+const products = await Product.find({
+  $nor: [{ price: { $lt: 1400 } }, { rating: { $gt: 4 } }],
+});
+
+// $not
+const products = await Product.find({ price: { $not: { $lt: 900 } } });
+```
+
+## 13. counting and sorting
+
+- countDocuments() / count()
+
+```js
+const products = await Product.find({ price: { $gt: 900 } }).countDocuments();
+
+// ascending
+const products = await Product.find().sort({ price: 1 });
+
+// descending
+const products = await Product.find().sort({ price: -1 });
+
+// sort and select
+const products = await Product.find()
+  .sort({ title: 1 })
+  .select({ title: 1, _id: 0 });
+console.log(products);
+```
+
+## 14. update data
+
+- update data syntax: `db.collectionName.updateOne(selection_item, update_data)`
+- update data syntax: `db.collectionName.findByIdAndUpdate(selection_item, update_data, {new: true})`
+
+```js
+// updateOne
+const products = await Product.updateOne({ _id }, { $set: { rating: 4.8 } });
+console.log(products);
+updateProduct("63432689c564aea397b3d210");
+
+// findByIdAndUpdate it returns old data
+const products = await Product.findByIdAndUpdate(
+  { _id },
+  { $set: { rating: 4.8 } }
+);
+console.log(products);
+
+// findByIdAndUpdate it returns updated data
+const products = await Product.findByIdAndUpdate(
+  { _id },
+  { $set: { rating: 4.7 } },
+  { new: true }
+);
+console.log(products);
+```
+
+## 15. delete data
+
+- example: `db.users.deleteOne({name:"anisul islam"})`
+
+```js
+const products = await Product.deleteOne({ _id });
+console.log(products);
+
+// findByIdAndDelete return deleted data
+const products = await Product.findByIdAndDelete({ _id });
+console.log(products);
+```
+
+## 16. mongoose validations
+
+- [official documentation](https://mongoosejs.com/docs/validation.html)
+- A common gotcha for beginners is that the unique option for schemas is not a validator.
+- Numbers have: min, max validators
+- Strings have: minlength, maxlength, trim, lowercase, enum
+- validator error message can be provided using array syntax and object syntax
+
+```js
+Array syntax: min: [6, 'Must be at least 6, got {VALUE}']
+Object syntax: enum: { values: ['Coffee', 'Tea'], message: '{VALUE} is not supported' }
+```
+
+```js
+// validation when creating schema
+/*
+  title: {
+    type: String,
+    required: [true, "product title is required"],
+
+    minlength: 3, 
+    minlength: [3, "error message here"],    
+    maxlength: 3, 
+   
+    lowercase: true,
+    uppercase: true,
+
+    trim: true // "     iphone 7      ",
+    enum: ["iphone", "samsung", "motorola"] // no other value is allowed other than these,
+    enum: {
+      values: ['iphone', 'samsung', motorola"],
+      message: '{VALUE} is not supported'
+    }
+  },
+  price:{
+     type: String,
+     required: true,
+     min: 20,
+     max: 30
+  }
+
+*/
+```
+
+## 17. Custom validations
+
+- for fulfilling own requirements based on certain situation we need to create custom validations.
+- read about email vliadation
+- [create your own validation regular expression](https://regexr.com/3e48o)
+
+```js
+price:{
+    type: String,
+    required: [true, "title is required"],
+    validate: {
+      validator: function (v) {
+        return v.length === 10;
+      },
+      message: (props) => `${props.value} is not a valid product title!`,
+    },
+},
+phone: {
+    type: String,
+    validate: {
+      validator: function(v) {
+        return /\d{3}-\d{3}-\d{4}/.test(v);
+      },
+      message: props => `${props.value} is not a valid phone number!`
+    },
+    required: [true, 'User phone number required']
+  }
+  email:{
+    // ^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$
+    type: String,
+    required: [true, 'User email is required'],
+    trim: true,
+    lowercase: true,
+    unique: true,
+    validate: {
+      validator: function(v) {
+        const emailRegex = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
+        return emailRegex.test(v);
+      },
+      message: props => `${props.value} is not a valid phone number!`
+    },
+     email: {
+        type: String,
+        trim: true,
+        lowercase: true,
+        unique: true,
+        required: 'Email address is required',
+        validate: [validateEmail, 'Please fill a valid email address'],
+        match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please fill a valid email address']
+    }
+
+  }
+```
+
+## 18. npm validator
+
+- `npm i validator`
+
+```js
+email: {
+    type: String,
+    unique: true,
+    required: [true, "email is required"],
+    trim: true,
+    lowercase: true,
+    validate: {
+      validator: validator.isEmail,
+      message: (props) => `${props.value} is not a valid email!`,
+    },
+  },
 ```
